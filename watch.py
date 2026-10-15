@@ -185,7 +185,8 @@ def fetch(slug: str) -> str:
     for attempt in range(3):
         try:
             resp = requests.get(PAGE_URL.format(slug=slug), headers={"User-Agent": USER_AGENT}, timeout=20)
-            resp.raise_for_status()
+            if resp.status_code >= 400:
+                raise requests.HTTPError(f"HTTP {resp.status_code} ({resp.headers.get('server', '?')})")
             return resp.text
         except requests.RequestException as exc:
             last_error = exc
@@ -224,12 +225,17 @@ def run_once(today: dt.date | None = None) -> None:
     failures: list[str] = []
     for slug in VISA_TYPES:
         try:
-            rows = parse_page(fetch(slug))
+            html = fetch(slug)
+            rows = parse_page(html)
         except Exception as exc:  # network error, blocked, etc.
             failures.append(str(exc))
             continue
         if not rows:
-            failures.append(f"{slug}: page loaded but no table rows parsed (layout may have changed)")
+            title = BeautifulSoup(html, "html.parser").title
+            failures.append(
+                f"{slug}: page loaded but no table rows parsed "
+                f"({len(html)} bytes, {html.count('<table')} tables, title={title.get_text(strip=True)[:60] if title else None!r})"
+            )
             continue
         print(f"{slug}: {len(rows)} rows")
         for row in rows:
@@ -270,7 +276,7 @@ def run_once(today: dt.date | None = None) -> None:
     # Forget sightings older than 30 days so the state file stays small.
     cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)
     seen = {k: v for k, v in seen.items() if dt.datetime.fromisoformat(v) > cutoff}
-    save_state({"seen": seen, "fail_streak": streak})
+    save_state({"seen": seen, "fail_streak": streak, "last_errors": failures})
 
 
 def main() -> int:
