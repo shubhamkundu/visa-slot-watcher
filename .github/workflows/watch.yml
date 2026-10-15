@@ -1,8 +1,9 @@
 name: Slot watcher
 
 on:
-  schedule:
-    - cron: "*/5 * * * *" # every 5 min (GitHub may delay runs by a few minutes)
+  # schedule paused: checkvisaslots blocks GitHub servers (HTTP 403)
+  # schedule:
+  #   - cron: "*/5 * * * *" # every 5 min (GitHub may delay runs by a few minutes)
   workflow_dispatch:
     inputs:
       test_alert:
