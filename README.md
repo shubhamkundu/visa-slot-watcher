@@ -9,7 +9,7 @@ Sends a loud push to your phone when someone reports a J-2 (or J-1) appointment 
 ## Setup (about 10 minutes)
 
 1. **Install ntfy on your phone** from the [App Store](https://apps.apple.com/app/ntfy/id1625396347) or [Google Play](https://play.google.com/store/apps/details?id=io.heckel.ntfy).
-2. **Subscribe to a hard-to-guess topic.** Tap **+** and enter something like `j2-slots-7f3k9q2m`. Anyone who knows the name can read it, so keep it random.
+2. **Subscribe to a hard-to-guess topic.** Tap **+** and enter your own random string (e.g. `j2-` plus 10+ random letters and digits). Anyone who knows the name can read it, so keep it random.
 3. **Make the alerts loud.**
    - **Android:** in the ntfy app, set "Urgent" notifications to override Do Not Disturb.
    - **iPhone:** allow ntfy in your Focus settings.
