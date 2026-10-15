@@ -236,7 +236,6 @@ def run_once(today: dt.date | None = None) -> None:
             key = sighting_key(slug, row)
             if matches(row, today) and key not in seen:
                 new_hits.append((slug, row))
-                seen[key] = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
 
     if new_hits:
         # J-2 interview sightings are what matter most; J-1 is a hint only.
@@ -248,6 +247,11 @@ def run_once(today: dt.date | None = None) -> None:
         body += "\n\nCheck YOUR calendar now at usvisascheduling.com (J-1 sightings are only a hint for J-2)."
         notify(title, body, 5 if has_j2 else 4, "rotating_light" if has_j2 else "eyes")
         print(f"alerted {len(new_hits)} new sighting(s)")
+        # Only remember sightings once a real push went out, so nothing is
+        # silently swallowed before the phone topic is configured.
+        if NTFY_TOPIC and not DRY_RUN:
+            now = dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")
+            seen.update({sighting_key(s, r): now for s, r in new_hits})
     else:
         print("no new matching sightings")
 
