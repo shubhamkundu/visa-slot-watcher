@@ -1,4 +1,8 @@
 {
-  "fail_streak": 1,
+  "fail_streak": 2,
+  "last_errors": [
+    "could not fetch j-2-regular: HTTP 403 (Vercel)",
+    "could not fetch j-1-regular: HTTP 403 (Vercel)"
+  ],
   "seen": {}
 }
