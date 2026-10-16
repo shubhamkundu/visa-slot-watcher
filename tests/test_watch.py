@@ -72,6 +72,13 @@ class ParseTests(unittest.TestCase):
         self.assertFalse(self.w.matches(rows["KOLKATA VAC"], TODAY)) # date already passed
         self.assertFalse(self.w.matches(rows["NEW DELHI"], TODAY))   # sighting 3 weeks old
 
+    def test_no_cutoff_by_default(self):
+        w = load({"CUTOFF_DATE": ""})
+        rows = {r["location"]: r for r in w.parse_page(FIXTURE)}
+        self.assertIsNone(w.CUTOFF_DATE)
+        self.assertTrue(w.matches(rows["HYDERABAD"], TODAY))     # Dec date now allowed
+        self.assertFalse(w.matches(rows["KOLKATA VAC"], TODAY))  # past dates still skipped
+
     def test_city_filter(self):
         w = load({"CITIES": "Chennai, Hyderabad"})
         rows = {r["location"]: r for r in w.parse_page(FIXTURE)}

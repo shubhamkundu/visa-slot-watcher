@@ -37,13 +37,14 @@ def _env(name: str, default: str) -> str:
 NTFY_SERVER = _env("NTFY_SERVER", "https://ntfy.sh").rstrip("/")
 NTFY_TOPIC = _env("NTFY_TOPIC", "")
 VISA_TYPES = [s.strip() for s in _env("VISA_TYPES", "j-2-regular,j-1-regular").split(",") if s.strip()]
-CUTOFF_DATE = dt.date.fromisoformat(_env("CUTOFF_DATE", "2026-11-20"))
+_cutoff = _env("CUTOFF_DATE", "")
+CUTOFF_DATE = dt.date.fromisoformat(_cutoff) if _cutoff else None  # None = no limit
 CITIES = {c.strip().upper() for c in _env("CITIES", "").split(",") if c.strip()}  # empty = all
 INCLUDE_VAC = _env("INCLUDE_VAC", "true").lower() == "true"
 MAX_AGE_HOURS = float(_env("MAX_AGE_HOURS", "24"))
 HEALTH_ALERT_AFTER = int(_env("HEALTH_ALERT_AFTER", "6"))  # consecutive failed runs
 STATE_FILE = Path(_env("STATE_FILE", str(Path(__file__).with_name("state.json"))))
-LOOP_SECONDS = int(_env("LOOP_SECONDS", "0"))  # 0 = run once (GitHub Actions)
+LOOP_SECONDS = int(_env("LOOP_SECONDS", "300"))  # 0 = run once (GitHub Actions)
 DRY_RUN = _env("DRY_RUN", "false").lower() == "true"
 TEST_ALERT = _env("TEST_ALERT", "false").lower() == "true"
 
@@ -149,7 +150,9 @@ def matches(row: dict, today: dt.date) -> bool:
         return False
     if CITIES and city not in CITIES:
         return False
-    if not (today <= row["earliest"] <= CUTOFF_DATE):
+    if row["earliest"] < today:
+        return False
+    if CUTOFF_DATE and row["earliest"] > CUTOFF_DATE:
         return False
     if row["age_hours"] is not None and row["age_hours"] > MAX_AGE_HOURS:
         return False
@@ -282,11 +285,11 @@ def run_once(today: dt.date | None = None) -> None:
 def main() -> int:
     if not NTFY_TOPIC and not DRY_RUN:
         print("NTFY_TOPIC is not set; printing alerts instead of sending them.")
-    print(f"watching {VISA_TYPES} | dates up to {CUTOFF_DATE} | cities: {', '.join(sorted(CITIES)) or 'all'}")
+    print(f"watching {VISA_TYPES} | dates up to {CUTOFF_DATE or 'any date'} | cities: {', '.join(sorted(CITIES)) or 'all'}")
     if LOOP_SECONDS <= 0:
         run_once()
         return 0
-    while True:  # local mode: python watch.py with LOOP_SECONDS=300
+    while True:  # local mode (default): check every LOOP_SECONDS
         try:
             run_once()
         except Exception as exc:

@@ -36,6 +36,7 @@ jobs:
         run: python watch.py
         env:
           NTFY_TOPIC: ${{ secrets.NTFY_TOPIC }}
+          LOOP_SECONDS: "0"
           CUTOFF_DATE: ${{ vars.CUTOFF_DATE }}
           CITIES: ${{ vars.CITIES }}
           VISA_TYPES: ${{ vars.VISA_TYPES }}

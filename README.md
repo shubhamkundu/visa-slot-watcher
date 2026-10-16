@@ -18,7 +18,7 @@ Sends a loud push to your phone when someone reports a J-2 (or J-1) appointment 
 
    | Variable | Default | Example |
    |---|---|---|
-   | `CUTOFF_DATE` | `2026-11-20` | Only alert for dates on or before this |
+   | `CUTOFF_DATE` | no limit | `2026-11-20` to only alert for dates on or before this |
    | `CITIES` | all five posts | `MUMBAI,CHENNAI,HYDERABAD` |
    | `VISA_TYPES` | `j-2-regular,j-1-regular` | Leave as is |
    | `MAX_AGE_HOURS` | `24` | Ignore older sightings |
@@ -40,7 +40,7 @@ If the source fails 6 runs in a row (about 30 minutes), you get one **"Slot watc
 
 ```bash
 pip install -r requirements.txt
-NTFY_TOPIC=your-topic LOOP_SECONDS=300 python watch.py
+NTFY_TOPIC=your-topic python watch.py   # checks every 5 min; add CUTOFF_DATE=2026-11-20 to limit dates
 ```
 
 ## Notes
