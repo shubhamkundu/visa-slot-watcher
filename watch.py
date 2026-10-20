@@ -27,6 +27,23 @@ DATE_FORMATS = ("%d %b, %y", "%d %b %Y", "%d %b, %Y", "%d %b %y")
 DATE_RE = re.compile(r"\b\d{1,2} [A-Za-z]{3},? \d{2,4}\b")
 
 
+def _load_dotenv(path: Path) -> None:
+    """Read KEY=value lines from .env next to this script (real env vars win)."""
+    try:
+        lines = path.read_text().splitlines()
+    except OSError:
+        return
+    for line in lines:
+        line = line.split("#", 1)[0].strip()
+        if "=" in line:
+            key, value = (part.strip() for part in line.split("=", 1))
+            if key and key not in os.environ:
+                os.environ[key] = value.strip("'\"")
+
+
+_load_dotenv(Path(__file__).with_name(".env"))
+
+
 def _env(name: str, default: str) -> str:
     """Read an env var, treating empty strings (unset GitHub vars) as missing."""
     value = os.environ.get(name, "").strip()

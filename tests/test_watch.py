@@ -117,6 +117,20 @@ class RunTests(unittest.TestCase):
             self.assertEqual([s[0] for s in sent], ["Slot watcher is NOT working"])
 
 
+class DotenvTests(unittest.TestCase):
+    def test_reads_env_file_without_overriding(self):
+        import watch
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Path(tmp) / ".env"
+            f.write_text("A_TEST_KEY=from_file  # note\nB_TEST_KEY='quoted'\n")
+            with mock.patch.dict(os.environ, {"B_TEST_KEY": "real"}, clear=False):
+                os.environ.pop("A_TEST_KEY", None)
+                watch._load_dotenv(f)
+                self.assertEqual(os.environ["A_TEST_KEY"], "from_file")
+                self.assertEqual(os.environ["B_TEST_KEY"], "real")
+            os.environ.pop("A_TEST_KEY", None)
+
+
 class HealthPingTests(unittest.TestCase):
     def test_ping_success_and_fail(self):
         w = load({"HEALTHCHECK_URL": "https://hc.example/abc/", "DRY_RUN": "false"})
