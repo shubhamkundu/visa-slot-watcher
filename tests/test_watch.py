@@ -117,5 +117,21 @@ class RunTests(unittest.TestCase):
             self.assertEqual([s[0] for s in sent], ["Slot watcher is NOT working"])
 
 
+class HealthPingTests(unittest.TestCase):
+    def test_ping_success_and_fail(self):
+        w = load({"HEALTHCHECK_URL": "https://hc.example/abc/", "DRY_RUN": "false"})
+        with mock.patch.object(w.requests, "get") as get:
+            w.ping_health(True)
+            w.ping_health(False)
+        self.assertEqual([c.args[0] for c in get.call_args_list],
+                         ["https://hc.example/abc", "https://hc.example/abc/fail"])
+
+    def test_no_ping_when_unset(self):
+        w = load({"HEALTHCHECK_URL": ""})
+        with mock.patch.object(w.requests, "get") as get:
+            w.ping_health(True)
+        get.assert_not_called()
+
+
 if __name__ == "__main__":
     unittest.main()

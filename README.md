@@ -43,6 +43,28 @@ pip install -r requirements.txt
 NTFY_TOPIC=your-topic python watch.py   # checks every 5 min; add CUTOFF_DATE=2026-11-20 to limit dates
 ```
 
+## Running on an Android phone (Termux)
+
+One-time setup, from inside the repo folder:
+
+```sh
+printf 'NTFY_TOPIC=your-topic\nHEALTHCHECK_URL=\n' > .env   # fill in your values
+sh install-boot.sh      # auto-start after reboot (needs the Termux:Boot app, opened once)
+sh run.sh               # start now; restarts itself if it ever exits
+```
+
+Also set **Settings → Apps → Termux → Battery → Unrestricted**, keep the phone charging, and don't swipe Termux away.
+
+### Know when it stops (dead-man's switch)
+
+The watcher can't warn you if the phone itself kills it, so an outside service watches for its heartbeat:
+
+1. Sign up free at [healthchecks.io](https://healthchecks.io) and **Add Check**: period **5 minutes**, grace **15 minutes**.
+2. Copy its ping URL (`https://hc-ping.com/...`) into `HEALTHCHECK_URL` in `.env`, then restart `run.sh`.
+3. Under **Integrations**, add **ntfy** (or a **Webhook** that POSTs to `https://ntfy.sh/your-topic`), so a missed heartbeat rings your phone. Email alerts are on by default too.
+
+The watcher pings after every check, and pings `/fail` when the slot pages can't be read.
+
 ## Notes
 
 - **Timing:** GitHub sometimes delays scheduled runs by 5–15 minutes, so keep checking the portal yourself in the evening (ET) too.

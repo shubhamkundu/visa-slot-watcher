@@ -47,6 +47,9 @@ STATE_FILE = Path(_env("STATE_FILE", str(Path(__file__).with_name("state.json"))
 LOOP_SECONDS = int(_env("LOOP_SECONDS", "300"))  # 0 = run once (GitHub Actions)
 DRY_RUN = _env("DRY_RUN", "false").lower() == "true"
 TEST_ALERT = _env("TEST_ALERT", "false").lower() == "true"
+# Dead-man's switch: pinged after every check. If pings stop (phone off, app killed),
+# the outside service (e.g. healthchecks.io) alerts you. Empty = disabled.
+HEALTHCHECK_URL = _env("HEALTHCHECK_URL", "").rstrip("/")
 
 
 # ---------------------------------------------------------------- parsing
@@ -216,7 +219,18 @@ def notify(title: str, message: str, priority: int, tags: str) -> None:
 
 
 # ---------------------------------------------------------------- run
-def run_once(today: dt.date | None = None) -> None:
+def ping_health(ok: bool) -> None:
+    """Tell the outside monitor we're alive (and whether the data source works)."""
+    if not HEALTHCHECK_URL or DRY_RUN:
+        return
+    try:
+        requests.get(HEALTHCHECK_URL + ("" if ok else "/fail"), timeout=10)
+    except requests.RequestException as exc:
+        print("health ping failed:", exc)
+
+
+def run_once(today: dt.date | None = None) -> bool:
+    """One check. Returns False if every source failed."""
     state = load_state()
     seen: dict[str, str] = state.get("seen", {})
     today = today or dt.date.today()
@@ -280,6 +294,7 @@ def run_once(today: dt.date | None = None) -> None:
     cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)
     seen = {k: v for k, v in seen.items() if dt.datetime.fromisoformat(v) > cutoff}
     save_state({"seen": seen, "fail_streak": streak, "last_errors": failures})
+    return not (failures and len(failures) == len(VISA_TYPES))
 
 
 def main() -> int:
@@ -287,13 +302,16 @@ def main() -> int:
         print("NTFY_TOPIC is not set; printing alerts instead of sending them.")
     print(f"watching {VISA_TYPES} | dates up to {CUTOFF_DATE or 'any date'} | cities: {', '.join(sorted(CITIES)) or 'all'}")
     if LOOP_SECONDS <= 0:
-        run_once()
+        ping_health(run_once())
         return 0
     while True:  # local mode (default): check every LOOP_SECONDS
+        print(f"--- {dt.datetime.now():%a %d %b %H:%M}")
         try:
-            run_once()
+            ok = run_once()
         except Exception as exc:
             print("run failed:", exc)
+            ok = False
+        ping_health(ok)
         time.sleep(max(LOOP_SECONDS, 120))
 
 
