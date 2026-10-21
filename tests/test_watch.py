@@ -35,8 +35,15 @@ FIXTURE = """
 TODAY = dt.date(2026, 10, 15)
 
 
+_TMP_DATA = tempfile.mkdtemp()
+os.environ["DATA_DIR"] = _TMP_DATA  # never write test sightings into the real data/
+os.environ.pop("GITHUB_TOKEN", None)
+
+
 def load(env: dict):
     with mock.patch.dict(os.environ, env, clear=False):
+        import collect
+        importlib.reload(collect)
         import watch
         return importlib.reload(watch)
 

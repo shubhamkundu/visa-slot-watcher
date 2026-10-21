@@ -20,6 +20,8 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
+import collect
+
 PAGE_URL = "https://checkvisaslots.com/latest-us-visa-availability/{slug}/"
 BOOKING_URL = "https://www.usvisascheduling.com/"
 USER_AGENT = "Mozilla/5.0 (personal visa slot watcher; polls every 5 min)"
@@ -54,6 +56,9 @@ def _env(name: str, default: str) -> str:
 NTFY_SERVER = _env("NTFY_SERVER", "https://ntfy.sh").rstrip("/")
 NTFY_TOPIC = _env("NTFY_TOPIC", "")
 VISA_TYPES = [s.strip() for s in _env("VISA_TYPES", "j-2-regular,j-1-regular").split(",") if s.strip()]
+# Logged for the model but never alerted on: same F/M/J appointment pool as J in India.
+OBSERVE_TYPES = [s.strip() for s in _env("OBSERVE_TYPES", "f-1-regular,f-2-regular").split(",") if s.strip()]
+FETCH_TYPES = list(dict.fromkeys(VISA_TYPES + OBSERVE_TYPES))
 _cutoff = _env("CUTOFF_DATE", "")
 CUTOFF_DATE = dt.date.fromisoformat(_cutoff) if _cutoff else None  # None = no limit
 CITIES = {c.strip().upper() for c in _env("CITIES", "").split(",") if c.strip()}  # empty = all
@@ -257,7 +262,9 @@ def run_once(today: dt.date | None = None) -> bool:
 
     new_hits: list[tuple[str, dict]] = []
     failures: list[str] = []
-    for slug in VISA_TYPES:
+    logged: list[dict] = []
+    n_rows = 0
+    for slug in FETCH_TYPES:
         try:
             html = fetch(slug)
             rows = parse_page(html)
@@ -272,6 +279,13 @@ def run_once(today: dt.date | None = None) -> bool:
             )
             continue
         print(f"{slug}: {len(rows)} rows")
+        n_rows += len(rows)
+        try:
+            logged += collect.record(slug, rows, state)
+        except Exception as exc:  # logging must never block alerts
+            print("logging failed:", exc)
+        if slug not in VISA_TYPES:
+            continue
         for row in rows:
             key = sighting_key(slug, row)
             if matches(row, today) and key not in seen:
@@ -297,7 +311,8 @@ def run_once(today: dt.date | None = None) -> bool:
 
     # Health check: warn once if the source keeps failing, so silence never means "broken".
     streak = state.get("fail_streak", 0)
-    if failures and len(failures) == len(VISA_TYPES):
+    all_failed = bool(failures) and len(failures) == len(FETCH_TYPES)
+    if all_failed:
         streak += 1
         print("all sources failed:", *failures, sep="\n  ")
         if streak == HEALTH_ALERT_AFTER:
@@ -310,8 +325,23 @@ def run_once(today: dt.date | None = None) -> bool:
     # Forget sightings older than 30 days so the state file stays small.
     cutoff = dt.datetime.now(dt.timezone.utc) - dt.timedelta(days=30)
     seen = {k: v for k, v in seen.items() if dt.datetime.fromisoformat(v) > cutoff}
-    save_state({"seen": seen, "fail_streak": streak, "last_errors": failures})
-    return not (failures and len(failures) == len(VISA_TYPES))
+    state.update({"seen": seen, "fail_streak": streak, "last_errors": failures})
+
+    # Model data + nudges + upload. Each step is isolated so it can never stop alerts.
+    for step in (
+        lambda: collect.record_poll(not all_failed, n_rows),
+        lambda: collect.check_burst(logged, state, notify),
+        lambda: collect.check_peak_window(state, notify),
+        lambda: print("sync:", collect.maybe_sync(state)) if LOOP_SECONDS > 0 else None,
+    ):
+        try:
+            step()
+        except Exception as exc:
+            print("data step failed:", exc)
+    if logged:
+        print(f"logged {len(logged)} new sighting(s)")
+    save_state(state)
+    return not all_failed
 
 
 def main() -> int:

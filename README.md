@@ -65,6 +65,16 @@ The watcher can't warn you if the phone itself kills it, so an outside service w
 
 The watcher pings after every check, and pings `/fail` when the slot pages can't be read.
 
+## Slot-timing model
+
+The phone logs every F-1, F-2, J-1 and J-2 sighting it reads (`data/sightings.jsonl`) and every check it makes (`data/polls.jsonl`). In India, J visas are scheduled in the same F/M/J pool, so F sightings help predict J-2.
+
+- **Upload:** with `GITHUB_TOKEN` in `.env`, the phone commits these two files and pulls `model.json` every 30 minutes. Use a fine-grained token limited to this repo, with only **Contents: Read and write**.
+- **Model:** `python model.py` turns the logs into `model.json` (top check windows) and `dashboard.json` (data for the dashboard). Hours only count when the phone was watching, so downtime never looks like a quiet hour.
+- **Nudges from the phone:**
+  - "Check now" when 2 or more separate F/J reports land within 30 minutes, in any city.
+  - A heads-up at the start of each top window, once the model has about 3 days of data.
+
 ## Notes
 
 - **Timing:** GitHub sometimes delays scheduled runs by 5–15 minutes, so keep checking the portal yourself in the evening (ET) too.
