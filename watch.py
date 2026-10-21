@@ -20,8 +20,6 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
-import collect
-
 PAGE_URL = "https://checkvisaslots.com/latest-us-visa-availability/{slug}/"
 BOOKING_URL = "https://www.usvisascheduling.com/"
 USER_AGENT = "Mozilla/5.0 (personal visa slot watcher; polls every 5 min)"
@@ -44,6 +42,8 @@ def _load_dotenv(path: Path) -> None:
 
 
 _load_dotenv(Path(__file__).with_name(".env"))
+
+import collect  # noqa: E402  (reads settings from .env, so import after loading it)
 
 
 def _env(name: str, default: str) -> str:
