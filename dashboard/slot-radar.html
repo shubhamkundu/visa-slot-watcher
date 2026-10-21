@@ -1,0 +1,311 @@
+<title>J-2 Slot Radar</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a single reading column of instrument panels; "when to check" leads, evidence follows. */
+:root {
+  --paper: #f2f5f4;
+  --panel: #ffffff;
+  --ink: #15232a;
+  --muted: #5b6b70;
+  --rule: #d7e0de;
+  --teal: #0d7a70;
+  --teal-soft: #d6ece8;
+  --stamp: #9c2b3b;
+  --stamp-soft: #f3dde0;
+  --amber: #a86400;
+  --amber-soft: #f6e8cf;
+  --bar: #9fb9b4;
+  --font-display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", sans-serif;
+  --font-body: "Instrument Sans", "Helvetica Neue", Arial, sans-serif;
+  --font-data: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0d1416; --panel: #141e21; --ink: #e2ebe8; --muted: #93a5a7; --rule: #26363a;
+    --teal: #43c2b3; --teal-soft: #173a37; --stamp: #ec7b8a; --stamp-soft: #3d1d23;
+    --amber: #e9a845; --amber-soft: #3a2c14; --bar: #3d5a57; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0d1416; --panel: #141e21; --ink: #e2ebe8; --muted: #93a5a7; --rule: #26363a;
+  --teal: #43c2b3; --teal-soft: #173a37; --stamp: #ec7b8a; --stamp-soft: #3d1d23;
+  --amber: #e9a845; --amber-soft: #3a2c14; --bar: #3d5a57; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--paper); color: var(--ink); font-family: var(--font-body); font-size: 15px; line-height: 1.5;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 48px;
+}
+.wrap { max-width: 920px; margin: 0 auto; display: grid; gap: 22px; }
+h1, h2 { font-family: var(--font-display); text-wrap: balance; margin: 0; }
+h1 { font-size: clamp(28px, 5vw, 40px); font-weight: 700; letter-spacing: -0.01em; }
+h2 { font-size: 20px; font-weight: 700; }
+.lede { color: var(--muted); max-width: 62ch; margin: 6px 0 0; }
+.eyebrow { font-family: var(--font-data); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--teal); }
+header { display: grid; gap: 10px; }
+.status { display: flex; flex-wrap: wrap; gap: 8px; }
+.pill { font-family: var(--font-data); font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--rule); background: var(--panel); white-space: nowrap; }
+.pill.ok { background: var(--teal-soft); border-color: transparent; color: var(--teal); }
+.pill.warn { background: var(--amber-soft); border-color: transparent; color: var(--amber); }
+.pill.bad { background: var(--stamp-soft); border-color: transparent; color: var(--stamp); }
+section { background: var(--panel); border: 1px solid var(--rule); border-radius: 10px; padding: 18px 18px 20px; display: grid; gap: 12px; min-width: 0; }
+.head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.note { color: var(--muted); font-size: 13px; margin: 0; max-width: 70ch; }
+.windows { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.win { border: 1px solid var(--rule); border-radius: 8px; padding: 12px 14px; display: grid; gap: 2px; }
+.win .t { font-family: var(--font-display); font-size: 22px; font-weight: 700; }
+.win .s { font-family: var(--font-data); font-size: 12px; color: var(--muted); }
+.win .l { font-size: 13px; color: var(--teal); font-weight: 600; }
+.chart { width: 100%; overflow-x: auto; }
+svg text { font-family: var(--font-data); fill: var(--muted); font-size: 10px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); }
+.sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+th { text-align: left; font-weight: 600; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid var(--rule); white-space: nowrap; }
+td { padding: 8px; border-bottom: 1px solid var(--rule); font-variant-numeric: tabular-nums; white-space: nowrap; }
+td.num, th.num { text-align: right; }
+.tbl { overflow-x: auto; }
+.chip { font-family: var(--font-data); font-size: 11px; font-weight: 500; padding: 1px 7px; border-radius: 4px; background: var(--rule); color: var(--ink); }
+.chip.J-2 { background: var(--stamp-soft); color: var(--stamp); }
+.chip.J-1 { background: var(--teal-soft); color: var(--teal); }
+.odds { display: grid; gap: 10px; }
+.odd { display: grid; grid-template-columns: 110px 1fr 56px; gap: 10px; align-items: center; font-size: 13.5px; }
+.track { height: 10px; background: var(--rule); border-radius: 5px; overflow: hidden; }
+.fill { height: 100%; background: var(--stamp); border-radius: 5px; }
+.odd .v { font-family: var(--font-data); text-align: right; }
+.empty { border: 1px dashed var(--rule); border-radius: 8px; padding: 18px; color: var(--muted); font-size: 14px; }
+.progress { display: grid; gap: 6px; max-width: 420px; }
+.progress .track .fill { background: var(--teal); }
+footer { color: var(--muted); font-size: 12.5px; display: grid; gap: 6px; max-width: 72ch; }
+.mono { font-family: var(--font-data); }
+@media (max-width: 520px) { .odd { grid-template-columns: 84px 1fr 48px; } section { padding: 14px 12px 16px; } }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">F/M/J pool · India consulates</div>
+    <h1>J-2 Slot Radar</h1>
+    <p class="lede">When J-2 appointments tend to appear, where, and how likely one is before your date. Built from every F-1, F-2, J-1 and J-2 sighting your spare phone logs.</p>
+    <div class="status" id="status"><span class="pill">Loading data…</span></div>
+  </header>
+
+  <section id="when">
+    <div class="head"><h2>When to check</h2><span class="note" id="whenTz"></span></div>
+    <div id="windows"></div>
+    <div class="chart" id="hourChart"></div>
+    <div class="legend" id="hourLegend"></div>
+    <p class="note" id="hourNote"></p>
+  </section>
+
+  <section id="daysSec">
+    <div class="head"><h2>Day of week</h2><span class="note">India calendar day</span></div>
+    <div class="chart" id="dowChart"></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Where to look</h2><span class="note">Last 14 days</span></div>
+    <div class="tbl" id="cities"></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Odds of a J-2 date</h2><span class="note">Chance someone reports a J-2 interview date on or before each day, within the next 7 days</span></div>
+    <div class="odds" id="odds"></div>
+  </section>
+
+  <section>
+    <div class="head"><h2>Latest sightings</h2><span class="note" id="recentNote"></span></div>
+    <div class="tbl" id="recent"></div>
+  </section>
+
+  <footer>
+    <div>Sightings are crowd-reported on checkvisaslots.com; a slot can be gone within minutes, so a sighting means "check now", not "it's waiting". Hours only count while the phone was watching, so downtime never looks like a quiet hour. J-2 estimates lean on the pooled F/J pattern until J-2 reports build up.</div>
+    <div id="gen" class="mono"></div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+  const DOW = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
+  // UTC hour -> labels in ET and IST for today's date (handles DST).
+  function hourLabels(h) {
+    const d = new Date(); d.setUTCHours(h, 0, 0, 0);
+    const et = d.toLocaleTimeString("en-US", { hour: "numeric", timeZone: "America/New_York" });
+    const etH = Number(d.toLocaleString("en-US", { hour: "numeric", hour12: false, timeZone: "America/New_York" })) % 24;
+    const ist = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", timeZone: "Asia/Kolkata" });
+    return { et, etH, ist };
+  }
+  function ago(iso) {
+    if (!iso) return "never";
+    const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+    if (m < 1) return "just now";
+    if (m < 60) return m + " min ago";
+    const h = Math.round(m / 60);
+    if (h < 48) return h + " h ago";
+    return Math.round(h / 24) + " days ago";
+  }
+  const fmtDate = (iso) => iso ? new Date(iso + "T12:00:00Z").toLocaleDateString("en-US", { month: "short", day: "numeric", timeZone: "UTC" }) : "–";
+  const cityName = (c) => c.toLowerCase().replace(/\b\w/g, (x) => x.toUpperCase());
+
+  function renderStatus(d) {
+    const m = d.meta || {};
+    const pills = [];
+    const lastMin = m.last_poll_utc ? (Date.now() - new Date(m.last_poll_utc)) / 60000 : Infinity;
+    if (!m.last_poll_utc) pills.push('<span class="pill warn">Phone: no checks uploaded yet</span>');
+    else if (lastMin < 90) pills.push(`<span class="pill ok">Phone checked ${ago(m.last_poll_utc)}</span>`);
+    else pills.push(`<span class="pill bad">Phone last checked ${ago(m.last_poll_utc)}</span>`);
+    pills.push(m.ready ? '<span class="pill ok">Model ready</span>' : '<span class="pill warn">Model learning</span>');
+    pills.push(`<span class="pill">${m.sightings_total ?? 0} sightings · ${m.covered_hours ?? 0} h watched${m.uptime_pct != null ? " · " + m.uptime_pct + "% uptime" : ""}</span>`);
+    $("status").innerHTML = pills.join("");
+    $("gen").textContent = m.generated_utc ? `Model updated ${ago(m.generated_utc)} · ${new Date(m.generated_utc).toLocaleString("en-US", { timeZone: "America/New_York", dateStyle: "medium", timeStyle: "short" })} ET` : "";
+  }
+
+  function barChart(values, labels, opts) {
+    const W = Math.max(320, Math.round(opts.el?.clientWidth || 860)), H = opts.h || 180, padL = 6, padB = 34, padT = 10;
+    const n = values.length, gap = 3, bw = (W - padL * 2 - gap * (n - 1)) / n;
+    const max = Math.max(1e-9, ...values.map((v) => v || 0));
+    let s = `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${esc(opts.aria)}">`;
+    for (let g = 1; g <= 3; g++) {
+      const y = padT + (H - padT - padB) * (1 - g / 3);
+      s += `<line x1="${padL}" x2="${W - padL}" y1="${y}" y2="${y}" stroke="var(--rule)" stroke-width="1"/>`;
+    }
+    values.forEach((v, i) => {
+      const x = padL + i * (bw + gap);
+      const bh = (H - padT - padB) * ((v || 0) / max);
+      const y = H - padB - bh;
+      const color = opts.color(i);
+      s += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(bh, v ? 1.5 : 0).toFixed(1)}" rx="2" fill="${color}"><title>${esc(opts.tip(i))}</title></rect>`;
+      if (opts.marker && opts.marker(i)) s += `<circle cx="${(x + bw / 2).toFixed(1)}" cy="${(H - padB + 7).toFixed(1)}" r="3" fill="var(--stamp)"/>`;
+      if (labels[i]) s += `<text x="${(x + bw / 2).toFixed(1)}" y="${H - 6}" text-anchor="middle">${esc(labels[i])}</text>`;
+    });
+    return s + "</svg>";
+  }
+
+  function renderWhen(d) {
+    const m = d.meta || {};
+    const fj = d.by_hour?.FJ?.rate || [];
+    const j2 = d.by_hour?.["J-2"]?.n || [];
+    // Order the 24 UTC bins by ET hour, midnight first.
+    const bins = [...Array(24).keys()].map((h) => ({ h, ...hourLabels(h) })).sort((a, b) => a.etH - b.etH);
+    const nowUtc = new Date().getUTCHours();
+    const top = new Set((d.windows || []).map((w) => w.start_utc_hour));
+    const every = ($("hourChart").clientWidth || 860) < 560 ? 6 : 3;
+    const labels = bins.map((b) => (b.etH % every === 0 ? b.et.replace(" ", "").toLowerCase() : ""));
+    $("whenTz").textContent = "Your time (ET) · India time on hover";
+
+    if (m.ready && fj[0] != null) {
+      $("windows").innerHTML = `<div class="windows">${[...(d.windows || [])].sort((a, b) => b.lift - a.lift).map((w) => {
+        const L = hourLabels(w.start_utc_hour);
+        return `<div class="win"><span class="t">${esc(L.et)} ET</span><span class="s">${esc(L.ist)} IST</span><span class="l">${Number(w.lift).toFixed(1)}× the average hour</span></div>`;
+      }).join("")}</div>`;
+      $("hourChart").innerHTML = barChart(bins.map((b) => fj[b.h]), labels, {
+        el: $("hourChart"), aria: "Slot sightings per watched hour, by hour of day",
+        color: (i) => (bins[i].h === nowUtc ? "var(--ink)" : top.has(bins[i].h) ? "var(--teal)" : "var(--bar)"),
+        tip: (i) => `${bins[i].et} ET / ${bins[i].ist} IST: ${(fj[bins[i].h] || 0).toFixed(2)} F/J sightings per watched hour; ${j2[bins[i].h] || 0} J-2`,
+        marker: (i) => (j2[bins[i].h] || 0) > 0,
+      });
+      $("hourLegend").innerHTML = '<span><span class="sw" style="background:var(--teal)"></span>Top windows</span><span><span class="sw" style="background:var(--ink)"></span>Current hour</span><span><span class="sw" style="background:var(--stamp);border-radius:50%"></span>Hours with a J-2 sighting</span>';
+      $("hourNote").textContent = "Bar height is F/J sightings per hour the phone was watching, smoothed so thin hours don't swing. Your phone sends a heads-up as each top window starts.";
+    } else {
+      const need = m.ready_needs || { covered_hours: 72, fj_sightings: 20 };
+      const ch = Math.min(1, (m.covered_hours || 0) / need.covered_hours);
+      const ev = Math.min(1, (m.sightings_timed || 0) / need.fj_sightings);
+      $("windows").innerHTML = `<div class="empty"><div class="progress">
+        <div><strong>Still learning.</strong> Best windows appear after about 3 days of watching.</div>
+        <div class="mono" style="font-size:12px">Watched ${m.covered_hours || 0} / ${need.covered_hours} h</div><div class="track"><div class="fill" style="width:${(ch * 100).toFixed(0)}%"></div></div>
+        <div class="mono" style="font-size:12px">Sightings while watching ${m.sightings_timed || 0} / ${need.fj_sightings}</div><div class="track"><div class="fill" style="width:${(ev * 100).toFixed(0)}%"></div></div>
+      </div></div>`;
+      const raw = d.raw_hour || [];
+      $("hourChart").innerHTML = raw.some((v) => v) ? barChart(bins.map((b) => raw[b.h] || 0), labels, {
+        el: $("hourChart"), aria: "Report times seen so far, by hour of day",
+        color: (i) => (bins[i].h === nowUtc ? "var(--ink)" : "var(--bar)"),
+        tip: (i) => `${bins[i].et} ET / ${bins[i].ist} IST: ${raw[bins[i].h] || 0} reports`,
+      }) : "";
+      $("hourLegend").innerHTML = "";
+      $("hourNote").textContent = raw.some((v) => v) ? "Early view: when reports were made in the last 30 days, not yet corrected for when the phone was watching. Treat it as a hint only." : "";
+    }
+  }
+
+  function renderDow(d) {
+    const m = d.meta || {};
+    const r = d.by_dow?.FJ?.rate || [];
+    if (!m.ready || r[0] == null) {
+      $("dowChart").innerHTML = '<div class="empty">Appears once the model is ready. Weekday patterns need at least a week of watching to mean anything.</div>';
+      return;
+    }
+    const today = (new Date(Date.now() + 5.5 * 3600e3).getUTCDay() + 6) % 7;
+    $("dowChart").innerHTML = barChart(r, DOW, {
+      h: 150, el: $("dowChart"), aria: "Sightings per watched hour by day of week",
+      color: (i) => (i === today ? "var(--teal)" : "var(--bar)"),
+      tip: (i) => `${DOW[i]}: ${(r[i] || 0).toFixed(2)} per watched hour (${(d.cover_dow || [])[i] || 0} h watched)`,
+    });
+  }
+
+  function renderCities(d) {
+    const cs = d.cities || [];
+    if (!cs.length) { $("cities").innerHTML = '<div class="empty">No city data yet.</div>'; return; }
+    const rows = cs.map((c, i) => `<tr>
+      <td>${i + 1}. ${esc(cityName(c.city))}</td>
+      <td class="num">${c.interview_sightings}</td>
+      <td class="num">${c.vac_sightings}</td>
+      <td class="num">${c.j2_sightings ? `<span class="chip J-2">${c.j2_sightings}</span>` : "0"}</td>
+      <td class="num">${c.j1_sightings}</td>
+      <td class="num">${c.median_lead_days != null ? Math.round(c.median_lead_days) + " d" : "–"}</td>
+      <td class="num">${fmtDate(c.best_interview_date_3d)}</td>
+      <td class="num">${ago(c.last_seen_utc)}</td></tr>`).join("");
+    $("cities").innerHTML = `<table><thead><tr><th>City</th><th class="num">Interview</th><th class="num">VAC</th><th class="num">J-2</th><th class="num">J-1</th><th class="num">Lead time</th><th class="num">Best date (3 d)</th><th class="num">Last seen</th></tr></thead><tbody>${rows}</tbody></table>
+      <p class="note" style="margin-top:8px">Ranked by F/J interview sightings per watched day. Lead time is how far out the reported interview dates are.</p>`;
+  }
+
+  function renderOdds(d) {
+    const os = d.odds || [];
+    if (!os.length || os.every((o) => o.j2_p7 == null)) {
+      $("odds").innerHTML = '<div class="empty">Needs at least a day of watching before odds mean anything.</div>';
+      return;
+    }
+    $("odds").innerHTML = os.map((o) => `<div class="odd"><span>By ${fmtDate(o.target)}</span>
+      <div class="track" title="J-1: ${Math.round((o.j1_p7 || 0) * 100)}%"><div class="fill" style="width:${Math.round(o.j2_p7 * 100)}%"></div></div>
+      <span class="v">${Math.round(o.j2_p7 * 100)}%</span></div>`).join("") +
+      '<p class="note">Seeing a date reported doesn\'t mean you\'ll get it; slots go within minutes. Hover a bar for the J-1 equivalent.</p>';
+  }
+
+  function renderRecent(d) {
+    const rs = (d.recent || []).slice(0, 25);
+    $("recentNote").textContent = rs.length ? `${rs.length} most recent` : "";
+    if (!rs.length) { $("recent").innerHTML = '<div class="empty">No sightings yet.</div>'; return; }
+    $("recent").innerHTML = `<table><thead><tr><th>Seen</th><th>Visa</th><th>City</th><th>Type</th><th class="num">Earliest date</th><th class="num">Dates</th></tr></thead><tbody>${rs.map((r) => `<tr>
+      <td title="${esc(new Date(r.seen_utc).toLocaleString("en-US", { timeZone: "America/New_York" }))} ET">${ago(r.seen_utc)}</td>
+      <td><span class="chip ${esc(r.type)}">${esc(r.type)}</span></td>
+      <td>${esc(cityName(r.city))}</td><td>${r.kind === "vac" ? "Biometrics" : "Interview"}</td>
+      <td class="num">${fmtDate(r.earliest)}</td><td class="num">${r.total ?? "–"}</td></tr>`).join("")}</tbody></table>`;
+  }
+
+  function render(d) {
+    renderStatus(d); renderWhen(d); renderDow(d); renderCities(d); renderOdds(d); renderRecent(d);
+  }
+
+  function emptyState(msg) {
+    $("status").innerHTML = `<span class="pill warn">${esc(msg)}</span>`;
+    $("windows").innerHTML = '<div class="empty">The model\'s results show here once the first refresh lands. Ask Claude to "refresh the slot radar" to load the latest phone data.</div>';
+    for (const id of ["dowChart", "cities", "odds", "recent"]) $(id).innerHTML = '<div class="empty">Waiting for data.</div>';
+  }
+
+  let latest = null;
+  (async () => {
+    const db = await window.claude?.use?.("db");
+    if (!db) { emptyState("Data unavailable in this view"); return; }
+    db.doc("dash/summary").onSnapshot((snap) => {
+      if (!snap.exists) { emptyState("No data yet"); return; }
+      latest = snap.data(); render(latest);
+    }, () => emptyState("Data connection lost; reload the page"));
+  })();
+  // Relative times and the current-hour marker drift; redraw from the same data each minute.
+  setInterval(() => { if (latest) render(latest); }, 60000);
+})();
+</script>

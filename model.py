@@ -143,6 +143,8 @@ def build(sightings: list[dict], polls: list[dict], now: dt.datetime) -> tuple[d
         order = sorted(range(24), key=lambda h: fj_rate[h], reverse=True)
         picked: list[int] = []
         for h in order:
+            if fj_rate[h] < 1.2 * mean_rate:
+                break  # only hours clearly busier than average count as windows
             if all(min((h - p) % 24, (p - h) % 24) > 1 for p in picked):
                 picked.append(h)
             if len(picked) == 3:
