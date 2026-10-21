@@ -246,9 +246,10 @@ def ping_health(ok: bool) -> None:
     if not HEALTHCHECK_URL or DRY_RUN:
         return
     try:
-        requests.get(HEALTHCHECK_URL + ("" if ok else "/fail"), timeout=10)
+        resp = requests.get(HEALTHCHECK_URL + ("" if ok else "/fail"), timeout=10)
+        print("heartbeat:", "ok" if resp.status_code == 200 else f"HTTP {resp.status_code} {resp.text.strip()[:60]}")
     except requests.RequestException as exc:
-        print("health ping failed:", exc)
+        print("heartbeat failed:", exc)
 
 
 def run_once(today: dt.date | None = None) -> bool:
@@ -348,6 +349,8 @@ def main() -> int:
     if not NTFY_TOPIC and not DRY_RUN:
         print("NTFY_TOPIC is not set; printing alerts instead of sending them.")
     print(f"watching {VISA_TYPES} | dates up to {CUTOFF_DATE or 'any date'} | cities: {', '.join(sorted(CITIES)) or 'all'}")
+    print("heartbeat:", "on" if HEALTHCHECK_URL else "OFF (HEALTHCHECK_URL not set in .env)",
+          "| upload:", "on" if collect.GITHUB_TOKEN else "OFF (GITHUB_TOKEN not set in .env)")
     if LOOP_SECONDS <= 0:
         ping_health(run_once())
         return 0
