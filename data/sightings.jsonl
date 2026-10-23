@@ -141,3 +141,5 @@
 {"type":"F-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2026-12-08","slots":null,"total":1,"seen_utc":"2026-10-23T17:31:00+00:00","logged_utc":"2026-10-23T17:33:24+00:00","src":"phone"}
 {"type":"F-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2026-10-28","slots":null,"total":1,"seen_utc":"2026-10-23T17:50:00+00:00","logged_utc":"2026-10-23T18:22:47+00:00","src":"phone"}
 {"type":"F-2","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2026-10-28","slots":2,"total":1,"seen_utc":"2026-10-23T17:49:00+00:00","logged_utc":"2026-10-23T18:22:47+00:00","src":"phone"}
+{"type":"F-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2026-12-08","slots":null,"total":1,"seen_utc":"2026-10-23T19:26:00+00:00","logged_utc":"2026-10-23T20:11:39+00:00","src":"phone"}
+{"type":"F-2","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2026-12-08","slots":1,"total":1,"seen_utc":"2026-10-23T19:26:00+00:00","logged_utc":"2026-10-23T20:11:40+00:00","src":"phone"}
