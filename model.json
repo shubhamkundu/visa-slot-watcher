@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-10-22T23:48:40+00:00",
+  "generated_utc": "2026-10-23T11:49:26+00:00",
   "ready": false,
   "windows": [
     {
@@ -12,7 +12,7 @@
       "start_utc_hour": 2,
       "label": "10 PM ET (7:30 AM IST)",
       "lift": 0,
-      "why": "F/J slot sightings run about 0.0x the daily average in this hour (0 seen over 1 watched hours)."
+      "why": "F/J slot sightings run about 0.0x the daily average in this hour (0 seen over 2 watched hours)."
     },
     {
       "start_utc_hour": 4,
