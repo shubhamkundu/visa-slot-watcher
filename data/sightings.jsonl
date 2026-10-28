@@ -191,3 +191,4 @@
 {"type":"F-2","location":"MUMBAI VAC","city":"MUMBAI","kind":"vac","earliest":"2026-11-02","slots":4,"total":1,"seen_utc":"2026-10-27T07:00:00+00:00","logged_utc":"2026-10-28T18:03:28+00:00","src":"phone"}
 {"type":"F-2","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-08","slots":2,"total":4,"seen_utc":"2026-10-28T17:40:00+00:00","logged_utc":"2026-10-28T18:03:28+00:00","src":"phone"}
 {"type":"F-2","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2026-11-12","slots":null,"total":5,"seen_utc":"2026-10-28T17:59:00+00:00","logged_utc":"2026-10-28T18:03:28+00:00","src":"phone"}
+{"type":"F-2","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2026-11-12","slots":null,"total":5,"seen_utc":"2026-10-28T18:00:00+00:00","logged_utc":"2026-10-28T18:08:33+00:00","src":"phone"}
