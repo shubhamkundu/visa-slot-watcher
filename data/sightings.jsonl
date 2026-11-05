@@ -265,3 +265,10 @@
 {"type":"J-1","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-08","slots":1,"total":4,"seen_utc":"2026-11-05T07:59:00+00:00","logged_utc":"2026-11-05T08:01:44+00:00","src":"phone"}
 {"type":"J-1","location":"KOLKATA","city":"KOLKATA","kind":"interview","earliest":"2026-12-10","slots":1,"total":3,"seen_utc":"2026-11-05T08:02:00+00:00","logged_utc":"2026-11-05T08:06:47+00:00","src":"phone"}
 {"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-19","slots":2,"total":2,"seen_utc":"2026-11-05T08:31:00+00:00","logged_utc":"2026-11-05T08:36:57+00:00","src":"phone"}
+{"type":"J-1","location":"MUMBAI VAC","city":"MUMBAI","kind":"vac","earliest":"2026-12-18","slots":2,"total":1,"seen_utc":"2026-11-05T08:56:00+00:00","logged_utc":"2026-11-05T09:02:09+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-08","slots":null,"total":4,"seen_utc":"2026-11-05T08:57:00+00:00","logged_utc":"2026-11-05T09:02:09+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-20","slots":5,"total":1,"seen_utc":"2026-11-05T08:57:00+00:00","logged_utc":"2026-11-05T09:02:09+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-19","slots":null,"total":3,"seen_utc":"2026-11-05T09:04:00+00:00","logged_utc":"2026-11-05T09:07:11+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-20","slots":5,"total":1,"seen_utc":"2026-11-05T08:59:00+00:00","logged_utc":"2026-11-05T09:07:11+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-19","slots":2,"total":3,"seen_utc":"2026-11-05T09:09:00+00:00","logged_utc":"2026-11-05T09:12:12+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-20","slots":2,"total":1,"seen_utc":"2026-11-05T09:08:00+00:00","logged_utc":"2026-11-05T09:12:12+00:00","src":"phone"}
