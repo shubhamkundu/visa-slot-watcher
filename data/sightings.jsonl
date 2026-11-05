@@ -272,3 +272,8 @@
 {"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-20","slots":5,"total":1,"seen_utc":"2026-11-05T08:59:00+00:00","logged_utc":"2026-11-05T09:07:11+00:00","src":"phone"}
 {"type":"J-1","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-19","slots":2,"total":3,"seen_utc":"2026-11-05T09:09:00+00:00","logged_utc":"2026-11-05T09:12:12+00:00","src":"phone"}
 {"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-20","slots":2,"total":1,"seen_utc":"2026-11-05T09:08:00+00:00","logged_utc":"2026-11-05T09:12:12+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-19","slots":2,"total":3,"seen_utc":"2026-11-05T09:10:00+00:00","logged_utc":"2026-11-05T09:17:16+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-20","slots":2,"total":1,"seen_utc":"2026-11-05T09:11:00+00:00","logged_utc":"2026-11-05T09:17:16+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-19","slots":2,"total":3,"seen_utc":"2026-11-05T09:19:00+00:00","logged_utc":"2026-11-05T09:22:18+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI","city":"NEW DELHI","kind":"interview","earliest":"2027-01-19","slots":3,"total":3,"seen_utc":"2026-11-05T09:21:00+00:00","logged_utc":"2026-11-05T09:27:20+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-20","slots":1,"total":1,"seen_utc":"2026-11-05T09:30:00+00:00","logged_utc":"2026-11-05T09:37:24+00:00","src":"phone"}
