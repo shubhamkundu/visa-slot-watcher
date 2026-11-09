@@ -1,23 +1,23 @@
 {
-  "generated_utc": "2026-11-09T00:47:35+00:00",
+  "generated_utc": "2026-11-09T12:50:35+00:00",
   "ready": true,
   "windows": [
     {
       "start_utc_hour": 8,
       "label": "3 AM ET (1:30 PM IST)",
-      "lift": 1.66,
+      "lift": 1.68,
       "why": "F/J slot sightings run about 1.7x the daily average in this hour (16 seen over 5 watched hours)."
     },
     {
       "start_utc_hour": 11,
       "label": "6 AM ET (4:30 PM IST)",
-      "lift": 1.78,
+      "lift": 1.8,
       "why": "F/J slot sightings run about 1.8x the daily average in this hour (12 seen over 3 watched hours)."
     },
     {
       "start_utc_hour": 17,
       "label": "12 PM ET (10:30 PM IST)",
-      "lift": 2.08,
+      "lift": 2.1,
       "why": "F/J slot sightings run about 2.1x the daily average in this hour (18 seen over 4 watched hours)."
     }
   ]
