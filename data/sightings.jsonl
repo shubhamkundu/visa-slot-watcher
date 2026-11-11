@@ -422,3 +422,4 @@
 {"type":"F-1","location":"MUMBAI VAC","city":"MUMBAI","kind":"vac","earliest":"2026-12-21","slots":null,"total":1,"seen_utc":"2026-11-11T13:27:00+00:00","logged_utc":"2026-11-11T13:33:23+00:00","src":"phone"}
 {"type":"F-2","location":"HYDERABAD VAC","city":"HYDERABAD","kind":"vac","earliest":"2026-12-01","slots":1,"total":1,"seen_utc":"2026-11-11T13:30:00+00:00","logged_utc":"2026-11-11T13:33:23+00:00","src":"phone"}
 {"type":"F-2","location":"MUMBAI VAC","city":"MUMBAI","kind":"vac","earliest":"2026-12-21","slots":2,"total":1,"seen_utc":"2026-11-11T13:24:00+00:00","logged_utc":"2026-11-11T13:33:23+00:00","src":"phone"}
+{"type":"J-1","location":"NEW DELHI VAC","city":"NEW DELHI","kind":"vac","earliest":"2027-01-20","slots":1,"total":1,"seen_utc":"2026-11-11T14:26:00+00:00","logged_utc":"2026-11-11T14:33:48+00:00","src":"phone"}
